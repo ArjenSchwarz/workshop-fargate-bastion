@@ -1,6 +1,14 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: Lambda and API Gateway part of the Fargate Bastions
+Parameters:
+  BastionCluster:
+    Type: String
+    Description: What is the name of the Bastion Cluster?
+    Default: default
+  BastionVpc:
+    Type: String
+    Description: The vpc of the public subnets
 Resources:
   CreateBastion:
     Type: AWS::Serverless::Function
@@ -10,9 +18,43 @@ Resources:
       CodeUri: ./create-bastion
       Description: Creates a bastion server
       Timeout: 30
+      Environment:
+        Variables:
+          BASTION_CLUSTER: !Ref BastionCluster
+          BASTION_VPC: !Ref BastionVpc
       Events:
         CreateBastion:
           Type: Api
           Properties:
             Path: /
             Method: post
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - 'ec2:DescribeNetworkInterfaces'
+                - 'ec2:DescribeSecurityGroups'
+                - 'ec2:AuthorizeSecurityGroupIngress'
+                - 'ec2:CreateSecurityGroup'
+              Resource: '*'
+            - Effect: Allow
+              Action:
+                - 'ecs:RunTask'
+                - 'ecs:ListTask*'
+                - 'ecs:DescribeTask*'
+              Resource: '*'
+              Condition:
+                ArnEquals:
+                  "ecs:cluster": !Join
+                    - ''
+                    - - 'arn:aws:ecs:'
+                      - !Ref "AWS::Region"
+                      - ':'
+                      - !Ref "AWS::AccountId"
+                      - ':cluster/'
+                      - !Ref BastionCluster
+            - Effect: Allow
+              Action:
+                - 'iam:PassRole'
+              Resource: '*'

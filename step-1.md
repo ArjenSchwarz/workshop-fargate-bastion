@@ -26,3 +26,7 @@ docker push $ACCOUNTNUMBER.dkr.ecr.$REGION.amazonaws.com/$REPONAME:$YOURNAME
 # docker tag bastion:arjen 1234567890:dkr.us-east-1.amazonaws.com/bastion:arjen
 # docker push 1234567890:dkr.us-east-1.amazonaws.com/bastion:arjen
 ```
+
+## Create a task definiton
+
+Create a task definiton for your image. Make sure this is a Fargate compatible definition, using the minimum allowed specs and uses your pushed up image as the only container definition.

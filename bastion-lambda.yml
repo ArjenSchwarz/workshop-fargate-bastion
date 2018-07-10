@@ -1,0 +1,18 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Lambda and API Gateway part of the Fargate Bastions
+Resources:
+  CreateBastion:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.lambda_handler
+      Runtime: python2.7
+      CodeUri: ./create-bastion
+      Description: Creates a bastion server
+      Timeout: 30
+      Events:
+        CreateBastion:
+          Type: Api
+          Properties:
+            Path: /
+            Method: post

@@ -6,6 +6,9 @@ Parameters:
     Type: String
     Description: What is the name of the Bastion Cluster?
     Default: default
+  BastionSubnets:
+    Type: String
+    Description: The list of public subnets you want the bastions to appear in
   BastionVpc:
     Type: String
     Description: The vpc of the public subnets
@@ -21,6 +24,7 @@ Resources:
       Environment:
         Variables:
           BASTION_CLUSTER: !Ref BastionCluster
+          BASTION_SUBNETS: !Ref BastionSubnets
           BASTION_VPC: !Ref BastionVpc
       Events:
         CreateBastion:

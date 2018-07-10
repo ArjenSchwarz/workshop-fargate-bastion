@@ -9,12 +9,16 @@ import os
 import time
 import re
 
+bastion_cluster = os.environ['BASTION_CLUSTER']
+subnet_string = os.environ['BASTION_SUBNETS']
+subnet_array = subnet_string.split(',')
 vpc = os.environ['BASTION_VPC']
 
 def lambda_handler(event, context):
     user = event['queryStringParameters']['user']
     ip = event['requestContext']['identity']['sourceIp'] + "/32"
     ec2 = boto3.client('ec2')
+    ecs = boto3.client('ecs')
 
     bastion_name = 'bastion-' + user
 
@@ -34,6 +38,22 @@ def lambda_handler(event, context):
         GroupId=sg,
         IpProtocol='tcp',
         ToPort=22
+    )
+
+    # Start the bastion container
+    response = ecs.run_task(
+        cluster=bastion_cluster,
+        taskDefinition=bastion_name,
+        count=1,
+        startedBy='bastion-builder',
+        launchType='FARGATE',
+        networkConfiguration={
+            'awsvpcConfiguration': {
+                'subnets': subnet_array,
+                'securityGroups': [sg],
+                'assignPublicIp': 'ENABLED'
+            }
+        }
     )
 
     response = {}

@@ -23,7 +23,7 @@ This will upload the zipped version of your Lambda code to that bucket and gener
 Once you have the packaged file you can then easily deploy it, both the first time and subsequent updates, with the following command:
 
 ```bash
-aws cloudformation update-stack --template-file packaged-bastion.yml --stack-name bastion-functions --capabilities CAPABILITY_IAM
+aws cloudformation deploy --template-file packaged-bastion.yml --stack-name bastion-functions --capabilities CAPABILITY_IAM
 ```
 
 The IAM capabalities flag is required for a serverless application.

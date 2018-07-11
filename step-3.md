@@ -2,6 +2,15 @@
 
 Add all the required permissions to your Lambda function and make it create a securitygroup linked to your name.
 
+Please note that if you use the SAM function, you will always need to package and deploy the template after you make changes. And if you add parameters, such as your VPC, you will need to supply these. For example:
+
+```bash
+aws cloudformation package --template-file bastion-lambda.yml --s3-bucket "doesnotexist.ig.nore.me" --output-template-file packaged-bastion.yml
+aws cloudformation deploy --template-file packaged-bastion.yml --stack-name bastion-functions --capabilities CAPABILITY_IAM --parameter-overrides BastionVpc=vpc-12345678
+```
+
+
+
 ## Lambda permissions
 
 It's time to extend our SAM template, by ensuring the Lambda function can do everything it needs to do. It requires the following permissions:
